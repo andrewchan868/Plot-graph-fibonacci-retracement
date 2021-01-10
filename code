@@ -54,8 +54,8 @@ plt.legend(loc='upper left')
 
 
 #see from the graphn substantiak upwards. find the min and max price
-price_min = 25000 #df.Close.min()
-price_max = 35000  #df.Close.max()
+price_min = 24600 #df.Close.min()
+price_max = 33500 #df.Close.max()
 
 #Fibonacci levels on trend as upward
 diff = price_max - price_min
@@ -79,3 +79,4 @@ plt.ylabel("Price")
 plt.xlabel("Date")
 plt.legend(loc=2)
 plt.show()
+
