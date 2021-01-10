@@ -1,0 +1,81 @@
+#To import stock prices
+from pandas_datareader import data as pdr
+
+#To plot
+import matplotlib.pyplot as plt
+!pip install mpl_finance
+!pip install yfinance
+#import candlestick plotting package
+from mpl_finance import candlestick2_ohlc
+#import ploting library
+import matplotlib.pyplot as plt
+#import yahoo finance package
+import yfinance as yf
+#import datetime package 
+import datetime as dt
+import pandas as pd
+
+#Download data from Yahoo
+data=yf.download('^HSI', start=dt.datetime(2014,1,1), end=dt.datetime.now(), period='1d')
+print(data)
+
+#Define moving average
+# Construct a function with input df and n (dataframe and n number of days)
+def MA(df, n):
+    MA = pd.Series(df['Close'].rolling(n, min_periods=n).mean(), name='MA_' + str(n))
+    df = df.join(MA)
+    return df
+#the function should return a column of n days moving average with the input Close prices
+
+# Calculate the 10, 20, 50 days moving average
+data=MA(data,10)
+data=MA(data,20)
+data=MA(data,50)
+# Drop data with nan value
+data.dropna(inplace=True)
+# Drop the Date Column
+data=data.reset_index(drop=True)
+print(data)
+
+# Plot as Candlesticks
+# Set a blank figure and axes
+fig, ax=plt.subplots(figsize=(20,10))
+# Plot the Moving Averages
+plt.plot(data['MA_10'],color='b', label='MA_10',linewidth=0.5)
+plt.plot(data['MA_20'],color='pink', label='MA_20',linewidth=0.5)
+plt.plot(data['MA_50'],color='orange', label='MA_50',linewidth=0.5)
+# Plot the price chart as candlesticks
+candlestick2_ohlc(ax, data['Open'],data['High'],data['Low'],data['Close'], width=0.2, colorup='green', colordown='r')
+# We do not care date here, so ignore it
+frame=plt.gca()
+frame.axes.get_xaxis().set_visible(False)
+#Show the legend on the upper left
+plt.legend(loc='upper left')
+
+
+#see from the graphn substantiak upwards. find the min and max price
+price_min = 25000 #df.Close.min()
+price_max = 35000  #df.Close.max()
+
+#Fibonacci levels on trend as upward
+diff = price_max - price_min
+level1 = price_max - 0.236 * diff
+level2 = price_max - 0.382 * diff
+level3 = price_max - 0.618 * diff
+
+print ("Level", "Price")
+print ("0 ", price_max)
+print ("0.236", level1)
+print ("0.382", level2)
+print ("0.618", level3)
+print ("1 ", price_min)
+
+ax.axhspan(level1, price_min, alpha = 0.4, color = 'lightsalmon')
+ax.axhspan(level2, level1, alpha=0.5, color='palegoldenrod')
+ax.axhspan(level3, level2, alpha=0.5, color='palegreen')
+ax.axhspan(price_max, level3, alpha=0.5, color='powderblue')
+
+plt.ylabel("Price")
+plt.xlabel("Date")
+plt.legend(loc=2)
+plt.show()
